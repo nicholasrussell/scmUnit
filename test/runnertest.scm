@@ -6,7 +6,7 @@
 ;;;;   runner tests 
 ;;;; --------------------------------------------------------------------------
 
-(let ((failure (call-capture-errors (lambda () (test-failure "failure msg"))))
+(let ((failure (call-capture-errors (lambda () (assertion-failure "failure msg"))))
       (err (call-capture-errors (lambda () (error "error msg")))))
 
   (assert-eq 'fail (scmunit:evaluate-test-result failure))

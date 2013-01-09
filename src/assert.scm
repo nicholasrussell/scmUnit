@@ -16,7 +16,13 @@
 ;; @param msg - Optional msg
 (define (scmunit:assert-exp exp expected actual msg)
   (when (not (exp))
-    (test-failure (scmunit:message-template msg "Assertion failed. Expected <~A>, was <~A>." (scmunit:messagify expected) (scmunit:messagify actual)))))
+    (let ((failure-condition (assertion-failure 
+                              (scmunit:message-template msg 
+                                                        "Assertion failed. Expected <~A>, was <~A>."
+                                                        (scmunit:messagify expected)
+                                                        (scmunit:messagify actual)))))
+      (stack-trace (current-output-port) failure-condition)
+      failure-condition)))
 
 ;;;;
 ;; assert-null

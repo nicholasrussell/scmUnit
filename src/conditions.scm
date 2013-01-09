@@ -3,29 +3,29 @@
 ;;;;   Nicholas Russell
 ;;;; --------------------------------------------------------------------------
 ;;;; conditions.scm
-;;;;   Test failure conditions
+;;;;   Conditions
 ;;;; --------------------------------------------------------------------------
 
-;; Custom test-failure condition type
-(define condition-type:test-failure
-  (make-condition-type 'test-failure condition-type:error '(message) 
+;; Custom assertion-failure condition type
+(define condition-type:assertion-failure
+  (make-condition-type 'assertion-failure condition-type:error '(message) 
     (lambda (condition port) (format port "~A" (access-condition condition 'message)))))
 
 ;;;;
-;; condition/test-failure?
-;;  Predicate to test if a condition is condition-type:test-failure
+;; condition/assertion-failure?
+;;  Predicate to test if a condition is condition-type:assertion-failure
 ;;
 ;; @return condition predicate
-(define condition/test-failure?
-  (condition-predicate condition-type:test-failure))
+(define condition/assertion-failure?
+  (condition-predicate condition-type:assertion-failure))
 
 ;;;;
-;; test-failure
-;;  Signal test-failure condition
+;; assertion-failure
+;;  Signal assertion-failure condition
 ;;
 ;; @return condition signaller
-(define test-failure
-  (condition-signaller condition-type:test-failure '(message) standard-error-handler))
+(define assertion-failure
+  (condition-signaller condition-type:assertion-failure '(message) standard-error-handler))
 
 ;;;;
 ;; call-capture-errors

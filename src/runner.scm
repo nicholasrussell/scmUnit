@@ -15,7 +15,7 @@
 (define (scmunit:evaluate-test-result test-result)
   (cond
     ((and (condition? test-result)
-          (condition/test-failure? test-result)) 'fail)
+          (condition/assertion-failure? test-result)) 'fail)
     ((and (condition? test-result)
           (condition/error? test-result)) 'error)
     (else 'pass)))

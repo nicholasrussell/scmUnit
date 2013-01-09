@@ -40,7 +40,9 @@
 (define-syntax scmunit:message-template
   (syntax-rules ()
     ((scmunit:message-template msg template arg ...)
-      (format (current-output-port) (string-append (if (null? msg) "" (string-append (scmunit:messagify msg) "~%")) template) arg ...))))
+      (format (current-output-port) 
+              (string-append (string-append (if (null? msg) "" (string-append (scmunit:messagify msg) "~%")) template))
+              arg ...))))
 
 ;;;;
 ;; scmunit:promisify

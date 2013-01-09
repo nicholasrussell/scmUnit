@@ -16,13 +16,13 @@
     (define (set-name n) (begin (set! name n) name))
     (define (set-proc p) (begin (set! proc p) proc))
 
-    (define (dispatch msg)
+    (define (test-object msg)
       (cond ((eq? msg 'get-name) (get-name))
             ((eq? msg 'get-proc) (get-proc))
             ((eq? msg 'set-name) (lambda (n) (set-name n)))
             ((eq? msg 'set-proc) (lambda (p) (set-proc p)))))
 
-    dispatch))
+    test-object))
 
 ;;;;
 ;; scmunit:testobject:get-name
