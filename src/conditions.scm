@@ -13,7 +13,7 @@
 
 ;;;;
 ;; condition/test-failure?
-;;	Predicate to test if a condition is condition-type:test-failure
+;;  Predicate to test if a condition is condition-type:test-failure
 ;;
 ;; @return condition predicate
 (define condition/test-failure?
@@ -21,7 +21,7 @@
 
 ;;;;
 ;; test-failure
-;; 	Signal test-failure condition
+;;  Signal test-failure condition
 ;;
 ;; @return condition signaller
 (define test-failure
@@ -29,7 +29,7 @@
 
 ;;;;
 ;; call-capture-errors
-;;	Calls a procedure `proc' and captures errors
+;;  Calls a procedure `proc' and captures errors
 ;;
 ;; @param proc
 ;; @return return of proc

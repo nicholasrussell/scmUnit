@@ -37,6 +37,11 @@
     (display "Passed ") (display (length passed)) (display "/") (display (length test-results)) (newline)
     (length passed)))
 
-(src-load "test/definetest.scm")
+(src-load "test/utiltest.scm")
+(src-load "test/conditionstest.scm")
+(src-load "test/asserttest.scm")
+(src-load "test/testobjecttest.scm")
+(src-load "test/testtest.scm")
+(src-load "test/runnertest.scm")
 
 'scmUnit
