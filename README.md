@@ -1,7 +1,4 @@
 ## scmUnit
-##### Nicholas Russell
------
-
 A unit testing framework for MIT-Scheme
 
 #### Example
