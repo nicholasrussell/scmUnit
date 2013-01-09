@@ -1,4 +1,4 @@
-# scmUnit
+## scmUnit
 A unit testing framework for MIT-Scheme
 
 ## Example
@@ -14,3 +14,5 @@ A unit testing framework for MIT-Scheme
 (run-test "larger test")
 (print-results)
 ```
+
+Thanks to Alexey Radul for [Test Manager](http://web.mit.edu/~axch/www/test_manager.html) to help get me started.
