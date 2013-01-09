@@ -21,7 +21,7 @@
                                                         "Assertion failed. Expected <~A>, was <~A>."
                                                         (scmunit:messagify expected)
                                                         (scmunit:messagify actual)))))
-      (stack-trace (current-output-port) failure-condition)
+      (stack-trace failure-condition (current-output-port))
       failure-condition)))
 
 ;;;;
