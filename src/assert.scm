@@ -6,6 +6,8 @@
 ;;;;   Assertions
 ;;;; --------------------------------------------------------------------------
 
+;(define scmunit:show-assertion-stack-traces #f)
+
 ;;;;
 ;; assert-exp
 ;;  When exp is false, throw test-fail with message.
@@ -16,12 +18,15 @@
 ;; @param msg - Optional msg
 (define (scmunit:assert-exp exp expected actual msg)
   (when (not (exp))
+    ;; FIXME to display stack-traces, wrap call-capture-errors lambda around assertion-failure.
+    ;; Commented for now as it causes call-capture-errors nesting, which is bad.
     (let ((failure-condition (assertion-failure 
                               (scmunit:message-template msg 
                                                         "Assertion failed. Expected <~A>, was <~A>."
                                                         (scmunit:messagify expected)
                                                         (scmunit:messagify actual)))))
-      (stack-trace failure-condition (current-output-port))
+      ;(when scmunit:show-assertion-stack-traces
+      ;    (stack-trace failure-condition (current-output-port)))
       failure-condition)))
 
 ;;;;
