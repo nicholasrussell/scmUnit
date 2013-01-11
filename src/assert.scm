@@ -16,18 +16,18 @@
 ;; @param expected - Expected value
 ;; @param actual - Actual value (exp)
 ;; @param msg - Optional msg
-(define (scmunit:assert-exp exp expected actual msg)
-  (when (not (exp))
-    ;; FIXME to display stack-traces, wrap call-capture-errors lambda around assertion-failure.
-    ;; Commented for now as it causes call-capture-errors nesting, which is bad.
-    (let ((failure-condition (assertion-failure 
-                              (scmunit:message-template msg 
-                                                        "Assertion failed. Expected <~A>, was <~A>."
-                                                        (scmunit:messagify expected)
-                                                        (scmunit:messagify actual)))))
-      ;(when scmunit:show-assertion-stack-traces
-      ;    (stack-trace failure-condition (current-output-port)))
-      failure-condition)))
+(define-syntax scmunit:assert-exp
+  (syntax-rules ()
+    ((scmunit:assert-exp exp expected msg)
+      (let ((sexp (lambda () exp))
+            (sexpected (lambda () expected)))
+        (when (not (sexp))
+          (let ((failure-condition (assertion-failure
+                                    (scmunit:message-template (scmunit:default-msg msg)
+                                                              scmunit:assertion-message
+                                                              (scmunit:messagify (sexpected))
+                                                              (scmunit:messagify (sexp))))))
+            failure-condition))))))
 
 ;;;;
 ;; assert-null
@@ -35,7 +35,7 @@
 ;; @param exp
 ;; @param #!optional msg
 (define (assert-null exp #!optional msg)
-  (scmunit:assert-exp (lambda () (null? exp)) '() exp (scmunit:default-msg msg)))
+  (scmunit:assert-exp (null? exp) '() msg))
 
 ;;;;
 ;; assert-not-null
@@ -43,7 +43,7 @@
 ;; @param exp
 ;; @param #!optional msg
 (define (assert-not-null exp #!optional msg)
-  (scmunit:assert-exp (lambda () (not (null? exp))) "not ()" exp (scmunit:default-msg msg)))
+  (scmunit:assert-exp (not (null? exp)) "not ()" msg))
 
 ;;;;
 ;; assert-true
@@ -51,7 +51,7 @@
 ;; @param exp
 ;; @param #!optional msg
 (define (assert-true exp #!optional msg)
-  (scmunit:assert-exp (lambda () exp) #t exp (scmunit:default-msg msg)))
+  (scmunit:assert-exp exp #t msg))
 
 ;;;;
 ;; assert-false
@@ -59,7 +59,7 @@
 ;; @param exp
 ;; @param #!optional msg
 (define (assert-false exp #!optional msg)
-  (scmunit:assert-exp (lambda () (not exp)) #f exp (scmunit:default-msg msg)))
+  (scmunit:assert-exp (not exp) #f msg))
 
 ;;;;
 ;; assert-equal
@@ -67,7 +67,7 @@
 ;; @param exp
 ;; @param #!optional msg
 (define (assert-equal exp act #!optional msg)
-  (scmunit:assert-exp (lambda () (equal? exp act)) exp act (scmunit:default-msg msg)))
+  (scmunit:assert-exp (equal? exp act) exp msg))
 (define assert-equals assert-equal)
 
 ;;;;
@@ -76,7 +76,7 @@
 ;; @param exp
 ;; @param #!optional msg
 (define (assert-eq exp act #!optional msg)
-  (scmunit:assert-exp (lambda () (eq? exp act)) exp act (scmunit:default-msg msg)))
+  (scmunit:assert-exp (eq? exp act) exp msg))
 
 ;;;;
 ;; assert-eqv
@@ -84,7 +84,7 @@
 ;; @param exp
 ;; @param #!optional msg
 (define (assert-eqv exp act #!optional msg)
-  (scmunit:assert-exp (lambda () (eqv? exp act)) exp act (scmunit:default-msg msg)))
+  (scmunit:assert-exp (eqv? exp act) exp msg))
 
 ;;;;
 ;; assert-=
@@ -92,7 +92,7 @@
 ;; @param exp
 ;; @param #!optional msg
 (define (assert-= exp act #!optional msg)
-  (scmunit:assert-exp (lambda () (= exp act)) exp act (scmunit:default-msg msg)))
+  (scmunit:assert-exp (= exp act) exp msg))
 (define assert= assert-=)
 
 ;;;;
@@ -100,4 +100,4 @@
 ;;
 ;; @param #!optional msg
 (define (assert-fail #!optional msg)
-  (scmunit:assert-exp (lambda () #f) "fail" "fail" (scmunit:default-msg msg)))
+  (scmunit:assert-exp #f #f msg))

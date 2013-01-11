@@ -34,6 +34,10 @@
   (assert-true (procedure? (scmunit:testobject:get-proc test-object)))
   (assert-false ((scmunit:testobject:get-proc test-object)))
 
+  (assert-true (scmunit:testobject:test-object? test-object))
+  (assert-false (scmunit:testobject:test-object? '()))
+  (assert-false (scmunit:testobject:test-object? (lambda () #t)))
+  (assert-false (scmunit:testobject:test-object? (lambda (x) x)))
 )
 
 (let ((test-object (scmunit:testobject:create-test-object "test" (lambda () (+ 2 3) (+ 4 5)))))

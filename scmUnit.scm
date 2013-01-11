@@ -9,12 +9,16 @@
 (define (src-load src)
   (with-working-directory-pathname (directory-namestring (current-load-pathname)) (lambda () (load src))))
 
+(src-load "src/constants.scm")
 (src-load "src/util.scm")
 (src-load "src/conditions.scm")
 (src-load "src/assert.scm")
+(src-load "src/testsuiteobject.scm")
+(src-load "src/testsuite.scm")
 (src-load "src/testobject.scm")
 (src-load "src/test.scm")
 (src-load "src/runner.scm")
+;(src-load "src/gwt.scm")
 
 ;;;; TODO ACTUALLY IMPLEMENT THIS
 ;;;; SEMI-STUBBING ...
@@ -40,6 +44,7 @@
 (src-load "test/utiltest.scm")
 (src-load "test/conditionstest.scm")
 (src-load "test/asserttest.scm")
+(src-load "test/testsuiteobjecttest.scm")
 (src-load "test/testobjecttest.scm")
 (src-load "test/testtest.scm")
 (src-load "test/runnertest.scm")

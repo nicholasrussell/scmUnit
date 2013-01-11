@@ -20,7 +20,8 @@
       (cond ((eq? msg 'get-name) (get-name))
             ((eq? msg 'get-proc) (get-proc))
             ((eq? msg 'set-name) (lambda (n) (set-name n)))
-            ((eq? msg 'set-proc) (lambda (p) (set-proc p)))))
+            ((eq? msg 'set-proc) (lambda (p) (set-proc p)))
+            ((eq? msg 'type) scmunit:testobject:test-object-type)))
 
     test-object))
 
@@ -71,4 +72,22 @@
   (let ((test-object (scmunit:testobject:test-object)))
     ((scmunit:testobject:set-name test-object) name)
     ((scmunit:testobject:set-proc test-object) body)
+
     test-object))
+
+;;;;
+;; scmunit:testobject:test-object?
+;;  Returns true if object is a test-object
+;;
+;; @param object
+;; @return boolean
+(define (scmunit:testobject:test-object? object)
+  (if (or (null? object) (not (procedure? object)))
+    #f
+    (let ((arity (procedure-arity object)))
+      (if (or (not (= (car arity) 1)) (not (= (cdr arity) 1)))
+        #f
+        (let ((result (call-capture-errors (lambda () (object 'type)))))
+          (if (condition? result)
+            #f
+            (eq? result scmunit:testobject:test-object-type)))))))

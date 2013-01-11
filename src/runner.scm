@@ -15,10 +15,10 @@
 (define (scmunit:evaluate-test-result test-result)
   (cond
     ((and (condition? test-result)
-          (condition/assertion-failure? test-result)) 'fail)
+          (condition/assertion-failure? test-result)) scmunit:test-fail)
     ((and (condition? test-result)
-          (condition/error? test-result)) 'error)
-    (else 'pass)))
+          (condition/error? test-result)) scmunit:test-error)
+    (else scmunit:test-pass)))
 
 ;;;;
 ;; run-test
@@ -32,5 +32,14 @@
     (set! test-results (append test-results (list (cons test-name test-eval))))
     test-eval))
 
-(define (run-error test-name)
+(define (run-test-with-errors test-name)
   ((get-test-by-name test-name)))
+
+(define (scmunit:test-passed? result)
+  (eq? result scmunit:test-pass))
+
+(define (scmunit:test-failed? result)
+  (eq? result scmunit:test-fail))
+
+(define (scmunit:test-error? result)
+  (eq? result scmunit:test-error))

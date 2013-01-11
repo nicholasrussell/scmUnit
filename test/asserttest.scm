@@ -13,9 +13,9 @@
     (error msg)))
 
 ;; scmunit:assert-exp tests
-(let ((result (call-capture-errors (lambda () (scmunit:assert-exp (lambda () #t) 1 1 '())))))
+(let ((result (call-capture-errors (lambda () (scmunit:assert-exp #t #t '())))))
   (asserttest:assert (not (condition/assertion-failure? result)) "scmunit:assert-exp #t failed"))
-(let ((result (call-capture-errors (lambda () (scmunit:assert-exp (lambda () #f) 1 1 '())))))
+(let ((result (call-capture-errors (lambda () (scmunit:assert-exp #f #f '())))))
   (asserttest:assert (condition/assertion-failure? result) "scmunit:assert-exp #f failed"))
 
 ;; assert-null tests
