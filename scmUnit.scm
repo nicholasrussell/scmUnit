@@ -33,6 +33,9 @@
   (src-load "test/testsuiteobjecttest.scm")
   (src-load "test/testobjecttest.scm")
   (src-load "test/testtest.scm")
-  (src-load "test/runnertest.scm"))
+  (src-load "test/runnertest.scm")
+
+  ;(src-load "test/bigtest.scm")
+)
 
 'scmUnit

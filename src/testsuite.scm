@@ -86,7 +86,7 @@
   (let ((name (if (string? suite-name)
                 suite-name
                 (error "Test suite name must be a symbol."))))
-    (when (not (equal? scmunit:testsuite:current-test-suite scmunit:testsuite:default-test-suite-name))
+    (when (not (equal? (scmunit:testsuite:get-current-test-suite-name) scmunit:testsuite:default-test-suite-name))
       (error "Already in a test suite!"))
     (let loop ((test-suites (map scmunit:testsuite:testsuiteobject:get-name (scmunit:testsuite:get-test-suites))))
       (if (null? test-suites)

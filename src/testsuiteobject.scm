@@ -14,6 +14,13 @@
 
     (define (get-name) name)
     (define (get-tests) tests)
+    (define (get-test test-name)
+      (let loop ((tests (get-tests)))
+        (if (null? tests)
+          '()
+          (if (equal? (scmunit:test:testobject:get-name (car tests)) test-name)
+            (car tests)
+            (loop (cdr tests))))))
     (define (set-name n) (when (not (string? n)) (error "Test suite name must be a string.")) (set! name n) (get-name))
     (define (set-tests tsts) (set! tests tsts) (get-tests))
     (define (add-test test-object)
@@ -24,6 +31,7 @@
     (define (test-suite-object msg)
       (cond ((eq? msg 'get-name) (get-name))
             ((eq? msg 'get-tests) (get-tests))
+            ((eq? msg 'get-test) (lambda (test-name) (get-test test-name)))
             ((eq? msg 'set-name) (lambda (n) (set-name n)))
             ((eq? msg 'add-test) (lambda (test-obj) (add-test test-obj)))
             ((eq? msg 'type) scmunit:testsuite:testsuiteobject:test-suite-object-type)))
@@ -47,6 +55,16 @@
 ;; @return tests
 (define (scmunit:testsuite:testsuiteobject:get-tests test-suite-object)
   (test-suite-object 'get-tests))
+
+;;;;
+;; scmunit:testsuite:testsuiteobject:get-test
+;;  Gets a test from test suite object's tests
+;;
+;; @param test-suite-object
+;; @param test-name
+;; @return test object
+(define (scmunit:testsuite:testsuiteobject:get-test test-suite-object test-name)
+  ((test-suite-object 'get-test) test-name))
 
 ;;;;
 ;; scmunit:testsuite:testsuiteobject:set-name
@@ -87,12 +105,4 @@
 ;; @param object
 ;; @return boolean
 (define (scmunit:testsuite:testsuiteobject:test-suite-object? object)
-  (if (or (null? object) (not (procedure? object)))
-    #f
-    (let ((arity (procedure-arity object)))
-      (if (or (not (= (car arity) 1)) (not (= (cdr arity) 1)))
-        #f
-        (let ((result (call-capture-errors (lambda () (object 'type)))))
-          (if (condition? result)
-            #f
-            (eq? result scmunit:testsuite:testsuiteobject:test-suite-object-type)))))))
+  (scmunit:check-object-type object scmunit:testsuite:testsuiteobject:test-suite-object-type))

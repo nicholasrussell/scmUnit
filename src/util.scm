@@ -85,3 +85,19 @@
   (if (not (eq? msg #!default))
     msg
     '()))
+
+;;;;
+;; scmunit:check-object-type
+;;
+;; @param object
+;; @param type
+(define (scmunit:check-object-type object type)
+  (if (or (null? object) (not (procedure? object)))
+    #f
+    (let ((arity (procedure-arity object)))
+      (if (or (not (= (car arity) 1)) (not (= (cdr arity) 1)))
+        #f
+        (let ((result (call-capture-errors (lambda () (object 'type)))))
+          (if (condition? result)
+            #f
+            (eq? result type)))))))

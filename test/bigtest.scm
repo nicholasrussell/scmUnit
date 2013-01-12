@@ -1,11 +1,3 @@
-## scmUnit
-A unit testing framework for MIT-Scheme
-
-## Example
-
-```lisp
-(load "path/to/scmUnit/scmUnit.scm")
-
 (define-test "Null Test" (assert-null '()) (assert-not-null #t))
 
 (define-test-suite "AddSuite")
@@ -29,10 +21,3 @@ A unit testing framework for MIT-Scheme
     (assert-equals 3 y)
     (assert-equals 9 (* y y))))
 (end-test-suite)
-
-(run-tests)
-
-(print-results)
-```
-
-Thanks to Alexey Radul for [Test Manager](http://web.mit.edu/~axch/www/test_manager.html) to help get me started.

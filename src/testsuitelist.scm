@@ -90,12 +90,4 @@
 ;; @param object
 ;; @return boolean
 (define (scmunit:testsuite:testsuitelist:test-suite-list? object)
-  (if (or (null? object) (not (procedure? object)))
-    #f
-    (let ((arity (procedure-arity object)))
-      (if (or (not (= (car arity) 1)) (not (= (cdr arity) 1)))
-        #f
-        (let ((result (call-capture-errors (lambda () (object 'type)))))
-          (if (condition? result)
-            #f
-            (eq? result scmunit:testsuite:testsuitelist:test-suite-list-type)))))))
+  (scmunit:check-object-type object scmunit:testsuite:testsuitelist:test-suite-list-type))

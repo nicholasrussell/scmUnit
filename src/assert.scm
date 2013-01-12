@@ -10,7 +10,7 @@
 
 ;;;;
 ;; assert-exp
-;;  When exp is false, throw test-fail with message.
+;;  When exp is false, throw assertion-failure with message.
 ;;
 ;; @param exp - Expression to be evaluated
 ;; @param expected - Expected value
