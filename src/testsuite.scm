@@ -7,48 +7,53 @@
 ;;;; --------------------------------------------------------------------------
 
 ;;;;
-;; scmunit:get-test-suites
-;; 
-;; @return test suites
-(define (scmunit:get-test-suites)
-  scmunit:*test-suites*)
+;; scmunit:testsuite:get-test-suite-list
+;;
+;; @return test suite list
+(define (scmunit:testsuite:get-test-suite-list)
+  scmunit:testsuite:*test-suites*)
 
 ;;;;
-;; scmunit:set-test-suites
+;; scmunit:testsuite:get-test-suites
+;; 
+;; @return test suites
+(define (scmunit:testsuite:get-test-suites)
+  (scmunit:testsuite:testsuitelist:get-test-suites (scmunit:testsuite:get-test-suite-list)))
+
+;;;;
+;; scmunit:testsuite:set-test-suites
 ;;
 ;; @param test-suites
 ;; @return new test suites
-(define (scmunit:set-test-suites test-suites)
-  (when (not (list? test-suites))
-    (error "Test suites not a list."))
-  (set! scmunit:*test-suites* test-suites)
-  (scmunit:get-test-suites))
+(define (scmunit:testsuite:set-test-suites test-suites)
+  (when (not (scmunit:testsuite:testsuitelist:test-suite-list? test-suites))
+    (error "Test suites not a test suite list."))
+  (set! scmunit:testsuite:*test-suites* test-suites)
+  (scmunit:testsuite:get-test-suites))
 
 ;;;;
-;; scmunit:get-current-test-suite
+;; scmunit:testsuite:get-current-test-suite-name
+;;
+;; @return current test suite name
+(define (scmunit:testsuite:get-current-test-suite-name)
+  scmunit:testsuite:*current-test-suite-name*)
+
+;;;;
+;; scmunit:testsuite:get-current-test-suite
 ;;
 ;; @return current test suite
-(define (scmunit:get-current-test-suite)
-  scmunit:*current-test-suite*)
+(define (scmunit:testsuite:get-current-test-suite)
+  (scmunit:testsuite:testsuitelist:get-test-suite (scmunit:testsuite:get-test-suite-list) (scmunit:testsuite:get-current-test-suite-name)))
 
 ;;;;
-;; scmunit:set-current-test-suite
+;; scmunit:testsuite:set-current-test-suite-name
 ;;
 ;; @param test suite name
-(define (scmunit:set-current-test-suite suite-name)
-  (when (not (member suite-name (map scmunit:testsuiteobject:get-name (scmunit:get-test-suites))))
+(define (scmunit:testsuite:set-current-test-suite-name suite-name)
+  (when (not (member suite-name (map scmunit:testsuite:testsuiteobject:get-name (scmunit:testsuite:get-test-suites))))
     (error (string-append "Test suite " (string-append suite-name (string-append " is not defined. Define it first with define-test-suite.")))))
-  (set! scmunit:*current-test-suite* suite-name)
-  (scmunit:get-current-test-suite))
-
-;;;;
-;; scmunit:add-test-suite
-;;
-;; @param test-suite-object
-(define (scmunit:add-test-suite test-suite-object)
-  (when (not (scmunit:testsuiteobject:test-suite-object? test-suite-object))
-    (error "Cannot add test suite, it is not a test suite object."))
-  (scmunit:set-test-suites (append (scmunit:get-test-suites) (list test-suite-object))))
+  (set! scmunit:testsuite:*current-test-suite-name* suite-name)
+  (scmunit:testsuite:get-current-test-suite-name))
 
 ;;;;
 ;; define-test-suite
@@ -61,10 +66,10 @@
       (let ((name (if (string? suite-name)
                         suite-name
                         (error "Test suite name must be a string."))))
-        (let loop ((test-suites (map scmunit:testsuiteobject:get-name (scmunit:get-test-suites))))
+        (let loop ((test-suites (map scmunit:testsuite:testsuiteobject:get-name (scmunit:testsuite:get-test-suites))))
           (if (null? test-suites)
             (begin
-              (scmunit:add-test-suite (scmunit:testsuiteobject:create-test-suite-object name))
+              (scmunit:testsuite:testsuitelist:add-test-suite (scmunit:testsuite:get-test-suite-list) (scmunit:testsuite:testsuiteobject:create-test-suite-object name))
               scmunit:ok)
             (if (equal? (car test-suites) name)
               scmunit:ok
@@ -81,14 +86,14 @@
   (let ((name (if (string? suite-name)
                 suite-name
                 (error "Test suite name must be a symbol."))))
-    (when (not (equal? scmunit:current-test-suite scmunit:default-test-suite-name))
+    (when (not (equal? scmunit:testsuite:current-test-suite scmunit:testsuite:default-test-suite-name))
       (error "Already in a test suite!"))
-    (let loop ((test-suites (map scmunit:testsuiteobject:get-name (scmunit:get-test-suites))))
+    (let loop ((test-suites (map scmunit:testsuite:testsuiteobject:get-name (scmunit:testsuite:get-test-suites))))
       (if (null? test-suites)
         (error "Test suite not found! Use define-test-suite to create it first.")
         (if (equal? (car test-suites) name)
           (begin 
-            (scmunit:set-current-test-suite name)
+            (scmunit:testsuite:set-current-test-suite-name name)
             scmunit:ok)
           (loop (cdr test-suites)))))))
 
@@ -97,7 +102,7 @@
 ;;  Ends definition of a test suite.
 (define (end-test-suite)
   (begin
-    (scmunit:set-current-test-suite scmunit:default-test-suite-name)
+    (scmunit:testsuite:set-current-test-suite-name scmunit:testsuite:default-test-suite-name)
     scmunit:ok))
 
 ;;;;
@@ -111,8 +116,10 @@
       (let ((body (lambda () tests ...)))
         (begin-test-suite name)
         (body)
-        (end-test-suite)))))
+        (end-test-suite)
+        (scmunit:ok)))))
 
 ;; Set up default test suite
-(define-test-suite scmunit:default-test-suite-name)
-(scmunit:set-current-test-suite scmunit:default-test-suite-name)
+(scmunit:testsuite:set-test-suites (scmunit:testsuite:testsuitelist:create-test-suite-list))
+(define-test-suite scmunit:testsuite:default-test-suite-name)
+(scmunit:testsuite:set-current-test-suite-name scmunit:testsuite:default-test-suite-name)

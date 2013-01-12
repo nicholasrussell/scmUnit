@@ -6,7 +6,7 @@
 ;;;;   Assertions
 ;;;; --------------------------------------------------------------------------
 
-;(define scmunit:show-assertion-stack-traces #f)
+;(define scmunit:show-assertion-stack-traces #t)
 
 ;;;;
 ;; assert-exp
@@ -27,6 +27,8 @@
                                                               scmunit:assertion-message
                                                               (scmunit:messagify (sexpected))
                                                               (scmunit:messagify (sexp))))))
+            ;(when scmunit:show-assertion-stack-traces
+            ;  (stack-trace failure-condition (current-output-port)))
             failure-condition))))))
 
 ;;;;

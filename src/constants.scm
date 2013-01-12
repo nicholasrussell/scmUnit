@@ -14,9 +14,14 @@
 (define scmunit:test-fail 'fail)
 (define scmunit:test-error 'error)
 
-(define scmunit:testobject:test-object-type 'test-object)
-(define scmunit:testsuiteobject:test-suite-object-type 'test-suite-object)
+(define scmunit:test:testobject:test-object-type 'test-object)
+(define scmunit:testresultobject:test-result-object-type 'test-result-object)
+(define scmunit:testsuite:testsuiteobject:test-suite-object-type 'test-suite-object)
+(define scmunit:testsuite:testsuitelist:test-suite-list-type 'test-suite-list)
 
-(define scmunit:default-test-suite-name "scmunit:default-test-suite")
-(define scmunit:*test-suites* '())
-(define scmunit:*current-test-suite* '())
+(define scmunit:*test-run-result* '())
+
+(define scmunit:testsuite:default-test-suite-name "scmunit:default-test-suite")
+(define scmunit:testsuite:*test-suites* '())
+(define scmunit:testsuite:*current-test-suite-name* '())
+
