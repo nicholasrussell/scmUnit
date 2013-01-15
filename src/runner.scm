@@ -82,7 +82,9 @@
         (begin
           (scmunit:run-test (scmunit:test:testobject:get-name (car suite-tests)) test-suite-name)
           (loop (cdr suite-tests)))))
-    (scmunit:runlistener:notify-listener scmunit:runlistener:after-suite test-suite-name)))
+    (scmunit:runlistener:notify-listener scmunit:runlistener:after-suite test-suite-name)
+    test-results))
+
 ;;;;
 ;; run-test-suite
 ;;  Runs all tests in suite `test-suite-name'
