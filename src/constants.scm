@@ -20,8 +20,10 @@
 (define scmunit:testsuite:testsuiteobject:test-suite-object-type 'test-suite-object)
 (define scmunit:testsuite:testsuitelist:test-suite-list-type 'test-suite-list)
 
-(define scmunit:*test-run-results* '())
 
 (define scmunit:testsuite:default-test-suite-name "scmunit:default-test-suite")
-(define scmunit:testsuite:*test-suites* '())
-(define scmunit:testsuite:*current-test-suite-name* '())
+
+(define scmunit:runlistener:before-suite 'before-suite)
+(define scmunit:runlistener:after-suite 'after-suite)
+(define scmunit:runlistener:before-test 'before-test)
+(define scmunit:runlistener:after-test 'after-test)

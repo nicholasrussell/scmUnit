@@ -40,9 +40,11 @@
     (set! test (scmunit:test:testobject:get-proc test-object)))
   (when (null? test)
     (error (string-append "Could not find test " (string-append test-name (string-append " in suite " test-suite-name)))))
+  (scmunit:runlistener:notify-listener scmunit:runlistener:before-test test-name)
   (let* ((test-result (call-capture-errors test))
          (test-eval (scmunit:evaluate-test-result test-result))
          (test-result-object (scmunit:test:testresultobject:create-test-result-object test-suite-name test-name test-eval)))
+    (scmunit:runlistener:notify-listener scmunit:runlistener:after-test test-name test-result)
     (set! scmunit:*test-run-results* (append scmunit:*test-run-results* (list test-result-object)))
     (let ((test-results (list-copy scmunit:*test-run-results*)))
       test-results)))
@@ -72,13 +74,15 @@
   (define test-suite (scmunit:testsuite:testsuitelist:get-test-suite (scmunit:testsuite:get-test-suite-list) test-suite-name))
   (when (null? test-suite)
     (error (string-append "Could not find test suite by name " test-suite-name)))
-  (let loop ((suite-tests (scmunit:testsuite:testsuiteobject:get-tests test-suite)))
-    (if (null? suite-tests)
-      (let ((test-results (list-copy scmunit:*test-run-results*)))
-        test-results)
-      (begin
-        (scmunit:run-test (scmunit:test:testobject:get-name (car suite-tests)) test-suite-name)
-        (loop (cdr suite-tests))))))
+  (scmunit:runlistener:notify-listener scmunit:runlistener:before-suite test-suite-name)
+  (let ((test-results '()))
+    (let loop ((suite-tests (scmunit:testsuite:testsuiteobject:get-tests test-suite)))
+      (if (null? suite-tests)
+        (set! test-results (list-copy scmunit:*test-run-results*))
+        (begin
+          (scmunit:run-test (scmunit:test:testobject:get-name (car suite-tests)) test-suite-name)
+          (loop (cdr suite-tests)))))
+    (scmunit:runlistener:notify-listener scmunit:runlistener:after-suite test-suite-name)))
 ;;;;
 ;; run-test-suite
 ;;  Runs all tests in suite `test-suite-name'

@@ -13,6 +13,7 @@
 
 ;; src
 (src-load "src/constants.scm")
+(src-load "src/globals.scm")
 (src-load "src/util.scm")
 (src-load "src/conditions.scm")
 (src-load "src/assert.scm")
@@ -22,6 +23,7 @@
 (src-load "src/testobject.scm")
 (src-load "src/test.scm")
 (src-load "src/testresultobject.scm")
+(src-load "src/runlistener.scm")
 (src-load "src/runner.scm")
 ;(src-load "src/gwt.scm")
 
