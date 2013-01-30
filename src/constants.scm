@@ -19,7 +19,12 @@
 (define scmunit:test:testresultobject:test-result-object-type 'test-result-object)
 (define scmunit:testsuite:testsuiteobject:test-suite-object-type 'test-suite-object)
 (define scmunit:testsuite:testsuitelist:test-suite-list-type 'test-suite-list)
+(define scmunit:testfixture:testfixtureobject:test-fixture-object-type 'test-fixture-object)
 
+(define scmunit:testfixture:types:before-suite 'before-suite)
+(define scmunit:testfixture:types:after-suite 'after-suite)
+(define scmunit:testfixture:types:before-test 'before-test)
+(define scmunit:testfixture:types:after-test 'after-test)
 
 (define scmunit:testsuite:default-test-suite-name "scmunit:default-test-suite")
 

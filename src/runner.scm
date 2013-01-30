@@ -41,13 +41,25 @@
   (when (null? test)
     (error (string-append "Could not find test " (string-append test-name (string-append " in suite " test-suite-name)))))
   (scmunit:runlistener:notify-listener scmunit:runlistener:before-test test-name)
-  (let* ((test-result (call-capture-errors test))
-         (test-eval (scmunit:evaluate-test-result test-result))
-         (test-result-object (scmunit:test:testresultobject:create-test-result-object test-suite-name test-name test-eval)))
-    (scmunit:runlistener:notify-listener scmunit:runlistener:after-test test-name test-result)
-    (set! scmunit:*test-run-results* (append scmunit:*test-run-results* (list test-result-object)))
-    (let ((test-results (list-copy scmunit:*test-run-results*)))
-      test-results)))
+  (define test-result-object '())
+  (let before-test-loop ((before-tests (scmunit:testsuite:testsuiteobject:get-before-tests test-suite)))
+    (when (and (not (null? before-tests)) (null? test-result-object))
+      (let ((fixture-eval (scmunit:evaluate-test-result (call-capture-errors (scmunit:testfixture:testfixtureobject:get-proc (car before-tests))))))
+        (when (not (scmunit:test-passed? fixture-eval))
+          (set! test-result-object (scmunit:test:testresultobject:create-test-result-object test-suite-name test-name (scmunit:evaluate-test-result fixture-eval)))))
+      (before-test-loop (cdr before-tests))))
+  (when (null? test-result-object)
+    (set! test-result-object (scmunit:test:testresultobject:create-test-result-object test-suite-name test-name (scmunit:evaluate-test-result (call-capture-errors test)))))
+  (let after-test-loop ((after-tests (scmunit:testsuite:testsuiteobject:get-after-tests test-suite)))
+    (when (not (null? after-tests))
+      (let ((fixture-eval (scmunit:evaluate-test-result (call-capture-errors (scmunit:testfixture:testfixtureobject:get-proc (car after-tests))))))
+        (when (and (not (scmunit:test-passed? fixture-eval)) (null? test-result-object))
+          (set! test-result-object (scmunit:test:testresultobject:create-test-result-object test-suite-name test-name (scmunit:evaluate-test-result fixture-eval)))))
+      (after-test-loop (cdr after-tests))))
+  (scmunit:runlistener:notify-listener scmunit:runlistener:after-test test-name test-result-object)
+  (set! scmunit:*test-run-results* (append scmunit:*test-run-results* (list test-result-object)))
+  (let ((test-results (list-copy scmunit:*test-run-results*)))
+    test-results))
 
 ;;;;
 ;; run-test
@@ -57,14 +69,42 @@
 ;; @return evaluated test result
 (define (run-test test-name)
   (set! scmunit:*test-run-results* '())
-  (define test-suite-name "")
+  (define test-suite '())
   (let loop ((test-suites (scmunit:testsuite:get-test-suites)))
     (if (null? test-suites)
       '()
       (if (not (null? (scmunit:testsuite:testsuiteobject:get-test (car test-suites) test-name)))
-        (set! test-suite-name (scmunit:testsuite:testsuiteobject:get-name (car test-suites)))
+        (set! test-suite (car test-suites))
         (loop (cdr test-suites)))))
-  (scmunit:run-test test-name test-suite-name))
+
+  (when (null? test-suite)
+    (error "Could not find test suite for test."))
+
+  (scmunit:runlistener:notify-listener scmunit:runlistener:before-suite (scmunit:testsuite:testsuiteobject:get-name test-suite))
+  (let ((test-results '()))
+    (define fixture-result '())
+
+    (let before-suite-loop ((before-suites (scmunit:testsuite:testsuiteobject:get-before-suites test-suite)))
+      (when (and (not (null? before-suites)) (null? fixture-result))
+        (let ((fixture-eval (scmunit:evaluate-test-result (call-capture-errors (scmunit:testfixture:testfixtureobject:get-proc (car before-suites))))))
+          (when (not (scmunit:test-passed? fixture-eval))
+            (set! fixture-result (scmunit:test:testresultobject:create-test-result-object test-suite-name test-name (scmunit:evaluate-test-result fixture-eval)))))
+        (before-suite-loop (cdr before-suites))))
+
+    (when (null? fixture-result)
+      (set! test-results (append test-results (scmunit:run-test test-name (scmunit:testsuite:testsuiteobject:get-name test-suite)))))
+
+    (let after-suite-loop ((after-suites (scmunit:testsuite:testsuiteobject:get-after-suites test-suite)))
+      (when (and (not (null? after-suites)) (null? fixture-result))
+        (let ((fixture-eval (scmunit:evaluate-test-result (call-capture-errors (scmunit:testfixture:testfixtureobject:get-proc (car after-suites))))))
+          (when (not (scmunit:test-passed? fixture-eval))
+            (set! fixture-result (scmunit:test:testresultobject:create-test-result-object test-suite-name test-name (scmunit:evaluate-test-result fixture-eval)))))
+        (after-suite-loop (cdr after-suites))))
+
+    (when (not (null? fixture-result))
+      (set! test-results (list fixture-result)))
+    (scmunit:runlistener:notify-listener scmunit:runlistener:after-suite (scmunit:testsuite:testsuiteobject:get-name test-suite))
+    test-results))
 
 ;;;;
 ;; scmunit:run-test-suite
@@ -76,12 +116,32 @@
     (error (string-append "Could not find test suite by name " test-suite-name)))
   (scmunit:runlistener:notify-listener scmunit:runlistener:before-suite test-suite-name)
   (let ((test-results '()))
-    (let loop ((suite-tests (scmunit:testsuite:testsuiteobject:get-tests test-suite)))
-      (if (null? suite-tests)
-        (set! test-results (list-copy scmunit:*test-run-results*))
-        (begin
-          (scmunit:run-test (scmunit:test:testobject:get-name (car suite-tests)) test-suite-name)
-          (loop (cdr suite-tests)))))
+    (define fixture-result '())
+
+    (let before-suite-loop ((before-suites (scmunit:testsuite:testsuiteobject:get-before-suites test-suite)))
+      (when (and (not (null? before-suites)) (null? fixture-result))
+        (let ((fixture-eval (scmunit:evaluate-test-result (call-capture-errors (scmunit:testfixture:testfixtureobject:get-proc (car before-suites))))))
+          (when (not (scmunit:test-passed? fixture-eval))
+            (set! fixture-result (scmunit:test:testresultobject:create-test-result-object test-suite-name test-name (scmunit:evaluate-test-result fixture-eval)))))
+        (before-suite-loop (cdr before-suites))))
+
+    (when (null? fixture-result)
+      (let loop ((suite-tests (scmunit:testsuite:testsuiteobject:get-tests test-suite)))
+        (if (null? suite-tests)
+          (set! test-results (list-copy scmunit:*test-run-results*))
+          (begin
+            (scmunit:run-test (scmunit:test:testobject:get-name (car suite-tests)) test-suite-name)
+            (loop (cdr suite-tests))))))
+
+    (let after-suite-loop ((after-suites (scmunit:testsuite:testsuiteobject:get-after-suites test-suite)))
+      (when (and (not (null? after-suites)) (null? fixture-result))
+        (let ((fixture-eval (scmunit:evaluate-test-result (call-capture-errors (scmunit:testfixture:testfixtureobject:get-proc (car after-suites))))))
+          (when (not (scmunit:test-passed? fixture-eval))
+            (set! fixture-result (scmunit:test:testresultobject:create-test-result-object test-suite-name test-name (scmunit:evaluate-test-result fixture-eval)))))
+        (after-suite-loop (cdr after-suites))))
+
+    (when (not (null? fixture-result))
+      (set! test-results (list fixture-result)))
     (scmunit:runlistener:notify-listener scmunit:runlistener:after-suite test-suite-name)
     test-results))
 

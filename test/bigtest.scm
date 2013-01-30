@@ -2,6 +2,13 @@
 
 (define-test-suite "AddSuite")
 (begin-test-suite "AddSuite")
+
+(define-before-suite (display "Before add suite!") (newline))
+(define-after-suite (display "After add suite!") (newline))
+(define-before-test (display "Before test!") (newline))
+(define-before-test (display "Multiple fixtures!") (newline))
+(define-after-test (display "After test!") (newline))
+
 (define-test "Add2"
   (let ((x 2))
     (assert-equals 2 x)
