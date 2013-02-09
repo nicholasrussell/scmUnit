@@ -6,8 +6,6 @@
 ;;;;   Utilities/random
 ;;;; --------------------------------------------------------------------------
 
-(load-option 'format) ;; For pretty output
-
 ;;;;
 ;; when
 ;;  Executes expressions when and only when pred is true
